@@ -19,12 +19,12 @@ namespace aid {
         int day;
         int comparator;
         int error;
-        int no_error = 0;//valid data
-        int cin_failed = 1;//istream failed on entering data
-        int day_error = 2;//value of day invalid
-        int mon_error = 3;//value of month invalid
-        int year_error = 4;//value of year invalid
-        int past_error = 5;//invalid date
+        int NO_ERROR = 0;//valid data
+        int CIN_FAILED = 1;//istream failed on entering data
+        int DAY_ERROR = 2;//value of day invalid
+        int MON_ERROR = 3;//value of month invalid
+        int YEAR_ERROR = 4;//value of year invalid
+        int PAST_ERROR = 5;//invalid date
         int mdays(int, int)const;
         int errCode(int);
     public:

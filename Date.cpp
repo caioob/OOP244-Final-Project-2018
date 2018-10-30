@@ -22,7 +22,7 @@ namespace aid {
         year = 0;
         month = 0;
         day = 0;
-        error = no_error;
+        error = NO_ERROR;
     }
     Date::Date(int year_, int month_, int day_){
         int comparator_ = year_ * 372 + month_ *31 + day;
@@ -30,47 +30,133 @@ namespace aid {
             year - year_;
             month = month_;
             day = day_;
-            error = no_error;
+            error = NO_ERROR;
         }
         if (year_ > max_year || year_ < min_year){
             year = 0;
             month = 0;
             day = 0;
-            error = year_error;
+            error = YEAR_ERROR;
             comparator = 0;
         }
         else if (month_ > 12 || month_ < 1){
             year = 0;
             month = 0;
             day = 0;
-            error = mon_error;
+            error = MON_ERROR;
             comparator = 0;
         }
         else if (day_ < 1 || day_ > mdays(month_, day_)){
             year = 0;
             month = 0;
             day = 0;
-            error = day_error;
+            error = DAY_ERROR;
             comparator = 0;
         }
         else if (comparator_ < min_date){
             year = 0;
             month = 0;
             day = 0;
-            error = past_error;
+            error = PAST_ERROR;
             comparator = 0;
         }
         else {
             year = year_;
             month = month_;
             day = day_;
-            error = no_error;
+            error = NO_ERROR;
             comparator = comparator_;
         }
 
     }
+    bool Date::operator == (const Date& rhs){
+        if (year == rhs.year && day == rhs.day && month == rhs.month && comparator == rhs.comparator){
+            return true;
+        }
+        else if (year == 0 || rhs.year == 0){
+            return false;
+        }
+        else {
+            return false;
+        }
+    }
+    bool Date::operator!=(const Date& rhs){
+        if (year != rhs.year && day != rhs.day && month != rhs.month && comparator != rhs.comparator){
+            return true;
+        }
+        else if (year == 0 || rhs.year == 0){
+            return false;
+        }
+        else {
+            return false;
+        }
+    }
+    bool Date::operator<(const Date& rhs){
+        if (year < rhs.year && day < rhs.day && month < rhs.month && comparator < rhs.comparator){
+            return true;
+        }
+        else if (year == 0 || rhs.year == 0){
+            return false;
+        }
+        else {
+            return false;
+        }
+    }
+    bool Date::operator>(const Date& rhs){
+        if (year > rhs.year && day > rhs.day && month > rhs.month && comparator > rhs.comparator){
+            return true;
+        }
+        else if (year == 0 || rhs.year == 0){
+            return false;
+        }
+        else {
+            return false;
+        }
+    }
+    bool Date::operator<=(const Date& rhs){
+        if (year <= rhs.year && day <= rhs.day && month <= rhs.month && comparator <= rhs.comparator){
+            return true;
+        }
+        else if (year == 0 || rhs.year == 0){
+            return false;
+        }
+        else {
+            return false;
+        }
+    }
+    bool Date::operator>=(const Date& rhs){
+        if (year >= rhs.year && day >= rhs.day && month >= rhs.month && comparator >= rhs.comparator){
+            return true;
+        }
+        else if (year == 0 || rhs.year == 0){
+            return false;
+        }
+        else {
+            return false;
+        }
+    }
+    int Date::errCode() const{
+        if (error == NO_ERROR){
+            return 0;
+        }
+        else if(error == CIN_FAILED){
+            return 1;
+        }
+        else if(error == DAY_ERROR){
+            return 2;
+        }
+        else if(error == MON_ERROR){
+            return 3;
+        }
+        else if(error == YEAR_ERROR){
+            return 4;
+        }
+        else if(error == PAST_ERROR){
+            return 5;
+        }
+    }
     bool Date::bad() const{
-        if (error == no_error){
+        if (error == NO_ERROR){
             return true;
         }
         else{
