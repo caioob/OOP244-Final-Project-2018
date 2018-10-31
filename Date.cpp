@@ -10,7 +10,6 @@
 using namespace std;
 namespace aid {
 
-
 	int Date::mdays(int mon, int year)const {
 		int days[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31, -1 };
 		int month = mon >= 1 && mon <= 12 ? mon : 13;
@@ -18,12 +17,18 @@ namespace aid {
 		return days[month] + int((month == 1)*((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0));
 	}
 
+    int Date::comparatorCalc(int year_, int month_, int day_){
+        int comparator_;
+        comparator_ = year_ * 372 + month_ *31 + day_;
+        return comparator_;
+    }
+
     Date::Date(){
         year = 0;
         month = 0;
         day = 0;
         error = NO_ERROR;
-        comparator = 0;
+        comparator = comparatorCalc(year, month, day);
     }
 
     Date::Date(int year_, int month_, int day_){
@@ -33,35 +38,35 @@ namespace aid {
             month = 0;
             day = 0;
             error = YEAR_ERROR;
-            comparator = 0;
+            comparator = comparatorCalc(year, month, day);
         }
         else if (month_ > 12 || month_ < 1){
             year = 0;
             month = 0;
             day = 0;
             error = MON_ERROR;
-            comparator = 0;
+            comparator = comparatorCalc(year, month, day);
         }
         else if (day_ < 1 || day_ > mdays(month_, year_)){
             year = 0;
             month = 0;
             day = 0;
             error = DAY_ERROR;
-            comparator = 0;
+            comparator = comparatorCalc(year, month, day);
         }
         else if (comparator_ < min_date){
             year = 0;
             month = 0;
             day = 0;
             error = PAST_ERROR;
-            comparator = 0;
+            comparator = comparatorCalc(year, month, day);
         }
         else {
             year = year_;
             month = month_;
             day = day_;
             error = NO_ERROR;
-            comparator = comparator_;
+            comparator = comparatorCalc(year, month, day);
         }
 
     }
@@ -88,47 +93,39 @@ namespace aid {
 
 
     bool Date::operator == (const Date& rhs){
-        if (year == rhs.year && day == rhs.day && month == rhs.month && comparator == rhs.comparator){
+        if (comparator == rhs.comparator){
             return true;
         }
-        else if (year == 0 || rhs.year == 0){
+        else{
             return false;
         }
-        else {
-            return false;
-        }
+
     }
 
     bool Date::operator!=(const Date& rhs){
-        if (year != rhs.year && day != rhs.day && month != rhs.month && comparator != rhs.comparator){
+
+        if(comparator != rhs.comparator){
             return true;
         }
-        else if (year == 0 || rhs.year == 0){
-            return false;
-        }
-        else {
+        else{
             return false;
         }
     }
 
     bool Date::operator<(const Date& rhs){
-        if (year < rhs.year && day < rhs.day && month < rhs.month && comparator < rhs.comparator){
+
+        if (comparator < rhs.comparator){
             return true;
         }
-        else if (year == 0 || rhs.year == 0){
-            return false;
-        }
-        else {
+        else{
             return false;
         }
     }
 
     bool Date::operator>(const Date& rhs){
-        if (year > rhs.year && day > rhs.day && month > rhs.month && comparator > rhs.comparator){
+
+        if (comparator > rhs.comparator){
             return true;
-        }
-        else if (year == 0 || rhs.year == 0){
-            return false;
         }
         else {
             return false;
@@ -136,48 +133,47 @@ namespace aid {
     }
 
     bool Date::operator<=(const Date& rhs){
-        if (year <= rhs.year && day <= rhs.day && month <= rhs.month && comparator <= rhs.comparator){
+
+        if(comparator <= rhs.comparator){
             return true;
         }
-        else if (year == 0 || rhs.year == 0){
-            return false;
-        }
-        else {
+        else{
             return false;
         }
     }
 
     bool Date::operator>=(const Date& rhs){
-        if (year >= rhs.year && day >= rhs.day && month >= rhs.month && comparator >= rhs.comparator){
+
+        if(comparator >= rhs.comparator){
             return true;
         }
-        else if (year == 0 || rhs.year == 0){
-            return false;
-        }
-        else {
+        else{
             return false;
         }
     }
 
     int Date::errCode() const{
+        int answer = 0;
         if (error == NO_ERROR){
-            return 0;
+            answer = 0;
         }
         else if(error == CIN_FAILED){
-            return 1;
+            answer = 1;
         }
         else if(error == DAY_ERROR){
-            return 2;
+            answer = 2;
         }
         else if(error == MON_ERROR){
-            return 3;
+            answer = 3;
         }
         else if(error == YEAR_ERROR){
-            return 4;
+            answer = 4;
         }
         else if(error == PAST_ERROR){
-            return 5;
+            answer = 5;
         }
+        return answer;
+        //return error;
     }
 
     bool Date::bad() const{
@@ -190,8 +186,11 @@ namespace aid {
     }
 
     std::istream& Date::read(std::istream& istr){
-        int year_, month_, day_;
-        cin >> year_ >> month_ >> day_;
+        int year_, month_, day_, comparator_;
+        char dash = '/';
+        cin >> year_ >> dash >> month_ >> dash >> day_;
+        comparator_ = comparatorCalc(year_, month_, day_);
+
         if(istr.fail() == true){
             error = CIN_FAILED;
         }
@@ -205,31 +204,37 @@ namespace aid {
             else if (day_ < 1 || day_ > mdays(month_, year_)){
                 error = DAY_ERROR;
             }
+            else if (min_date > comparator_){
+                error = PAST_ERROR;
+            }
             else{
                 error = NO_ERROR;
                 year = year_;
                 month = month_;
                 day = day_;
+                comparator = comparator_;
             }
         }
+        return istr;
     }
 
     std::ostream& Date::write(std::ostream& ostr) const{
         cout << aid::Date::year << "/";
         cout.width(2);
-        cout.fill(0);
+        cout.fill('0');
         cout << aid::Date::month << "/";
         cout.width(2);
-        cout.fill(0);
+        cout.fill('0');
         cout << aid::Date::day;
+        return ostr;
     }
 }
 
 std::ostream& operator << (std::ostream& ostr, aid::Date& date){
-    date.write(ostr);
+    return date.write(ostr);
 }
 
 std::istream& operator >> (std::istream& istr, aid::Date& date){
-    date.read(istr);
+    return date.read(istr);
 }
 
